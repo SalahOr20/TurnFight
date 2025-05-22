@@ -46,11 +46,17 @@ jobs:
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}
-          git fetch origin
+          
+          # Récupère toute l'historique
+          git fetch --unshallow || true
+          git fetch origin dev
+          
+          # Crée la branche de secours
           git checkout -b fail-${GITHUB_SHA::7} origin/dev
           git push origin fail-${GITHUB_SHA::7}
           
-          # Reset dev to previous commit and force push
+          # Revenir au commit précédent
           git checkout dev
-          git reset --hard HEAD~1
+          PREV_COMMIT=$(git rev-list origin/dev | tail -n 1)
+          git reset --hard "$PREV_COMMIT"
           git push origin dev --force
