@@ -37,4 +37,20 @@ jobs:
           git checkout main || git checkout -b main
           git merge origin/dev --no-ff --allow-unrelated-histories -m "Auto-merge from dev"
           git push origin main
-      
+
+      - name: Create failure branch and revert dev if tests fail
+        if: failure()
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}
+          git fetch origin
+          git checkout -b failure/${GITHUB_SHA::7} origin/dev
+          git push origin failure/${GITHUB_SHA::7}
+
+          # Reset dev to previous commit and force push
+          git checkout dev
+          git reset --hard HEAD~1
+          git push origin dev --force
