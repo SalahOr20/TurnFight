@@ -34,17 +34,3 @@ jobs:
           git checkout main || git checkout -b main
           git merge origin/dev --no-ff --allow-unrelated-histories -m "Auto-merge from dev"
           git push origin main
-
-      - name: Create failure branch if tests fail
-        if: failure()
-        uses: actions/github-script@v6
-        with:
-          script: |
-            const branchName = `failure/${context.sha.substring(0, 7)}`
-            await github.git.createRef({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              ref: `refs/heads/${branchName}`,
-              sha: context.sha
-            })
-            core.setFailed(`Tests failed. Created branch: ${branchName}`)
