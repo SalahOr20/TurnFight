@@ -47,9 +47,9 @@ jobs:
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}
           git fetch origin
-          git checkout -b failure/${GITHUB_SHA::7} origin/dev
-          git push origin failure/${GITHUB_SHA::7}
-
+          git checkout -b fail-${GITHUB_SHA::7} origin/dev
+          git push origin fail-${GITHUB_SHA::7}
+          
           # Reset dev to previous commit and force push
           git checkout dev
           git reset --hard HEAD~1
