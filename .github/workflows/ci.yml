@@ -10,19 +10,22 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name:  Checkout code
+      - name: Checkout code
         uses: actions/checkout@v3
 
-      - name:  Setup Java
+      - name: Setup Java
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
           java-version: '17'
 
-      - name:  Build & test with Maven
+      - name: Make mvnw executable
+        run: chmod +x mvnw
+
+      - name: Build & test with Maven
         run: ./mvnw clean verify
 
-      - name:  Merge dev to main if tests pass
+      - name: Merge dev to main if tests pass
         if: success()
         run: |
           git config --global user.name 'github-actions[bot]'
@@ -32,7 +35,7 @@ jobs:
           git merge origin/dev --no-ff -m "Auto-merge from dev"
           git push origin main
 
-      - name:  Create failure branch if tests fail
+      - name: Create failure branch if tests fail
         if: failure()
         uses: actions/github-script@v6
         with:
