@@ -10,49 +10,55 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0  # nécessaire pour pouvoir reset et push
+    - name: Checkout code
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0   # important pour avoir tout l'historique
 
-      - name: Setup Java
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'temurin'
-          java-version: '17'
+    - name: Setup Java
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'temurin'
+        java-version: '17'
 
-      - name: Make mvnw executable
-        run: chmod +x mvnw
+    - name: Make mvnw executable
+      run: chmod +x mvnw
 
-      - name: Build & test with Maven
-        id: maven-test
-        run: ./mvnw clean verify
-        continue-on-error: true  # on continue même si ça plante
+    - name: Build & test with Maven
+      run: ./mvnw clean verify
+      continue-on-error: true  # on continue même si erreur pour gérer après
 
-      - name: Check test result and merge or handle failure
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          git config --global user.name 'github-actions[bot]'
-          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+    - name: Merge dev to main if tests pass
+      if: ${{ success() && !steps.build-and-test-with-maven.outcome == 'failure' }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        git config --global user.name 'github-actions[bot]'
+        git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+        git remote set-url origin https://github.com/${{ github.repository }}
+        git fetch origin
+        git checkout main || git checkout -b main
+        git merge origin/dev --no-ff --allow-unrelated-histories -m "Auto-merge from dev"
+        git push origin main
 
-          if [ "${{ steps.maven-test.outcome }}" = "success" ]; then
-            echo "Tests passed, merging dev into main..."
-            git fetch origin
-            git checkout main || git checkout -b main
-            git merge origin/dev --no-ff --allow-unrelated-histories -m "Auto-merge from dev"
-            git push origin main
-          else
-            echo "Tests failed, creating failure branch and resetting dev..."
-            git checkout dev
+    - name: On test failure create failure branch and revert dev by 1 commit
+      if: failure()
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        TIMESTAMP=$(date +'%Y%m%d-%H%M%S')
+        FAILURE_BRANCH="failure-$TIMESTAMP"
 
-            # Créer la branche failure à partir de dev (état actuel)
-            git branch -f failure
-            git push origin failure --force
+        git config --global user.name 'github-actions[bot]'
+        git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+        git remote set-url origin https://github.com/${{ github.repository }}
+        git fetch origin
+        git checkout dev
 
-            # Reculer dev d'un commit
-            git reset --hard HEAD~1
-            git push origin dev --force
+        # Création de la branche failure unique
+        git branch "$FAILURE_BRANCH"
+        git push origin "$FAILURE_BRANCH"
 
-            echo "Failure branch created and dev branch reset."
-            exit 1  # optionnel, pour marquer le job comme failed
+        # Reculer dev d'un commit
+        git reset --hard HEAD~1
+        git push origin dev --force
