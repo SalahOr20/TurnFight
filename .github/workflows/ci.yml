@@ -12,6 +12,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # nécessaire pour pouvoir reset et push
 
       - name: Setup Java
         uses: actions/setup-java@v3
@@ -25,7 +27,40 @@ jobs:
       - name: Build & test with Maven
         id: maven-test
         run: ./mvnw clean verify
-        continue-on-error: true   # <-- On continue même si échec
+        continue-on-error: true  # On continue même si ça plante
 
       - name: Merge or handle failure
         env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -e
+
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}
+          
+          # On vérifie le résultat du test
+          if [ "${{ steps.maven-test.outcome }}" = "success" ]; then
+            echo "✅ Tests passed, merging dev into main..."
+            git fetch origin
+            git checkout main || git checkout -b main
+            git merge origin/dev --no-ff --allow-unrelated-histories -m "Auto-merge from dev"
+            git push origin main
+          else
+            echo "❌ Tests failed, creating failure branch and resetting dev..."
+
+            git fetch origin
+            git checkout dev
+
+            # Création d'une branche failure-<shortsha> pour garder une trace
+            FAILURE_BRANCH="failure-$(git rev-parse --short HEAD)"
+            git branch -f "$FAILURE_BRANCH"
+            git push origin "$FAILURE_BRANCH" --force
+
+            # Reculer dev d'un commit
+            git reset --hard HEAD~1
+            git push origin dev --force
+
+            echo "Failure branch '$FAILURE_BRANCH' created and dev branch reset."
+            exit 1  # marque le job comme failed
+          fi
