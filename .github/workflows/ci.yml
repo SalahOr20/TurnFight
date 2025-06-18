@@ -19,22 +19,44 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Make mvnw executable
-        run: chmod +x mvnw
-
       - name: Build & test with Maven
         run: ./mvnw clean verify
 
       - name: Merge dev to main if tests pass
         if: success()
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}
           git fetch origin
-          git checkout main || git checkout -b main
-          git merge origin/dev --no-ff --allow-unrelated-histories -m "Auto-merge from dev"
+          git checkout main
+          git merge origin/dev --no-ff -m "Auto-merge from dev"
           git push origin main
-      
+
+      - name: Create failure branch if tests fail
+        if: failure()
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const branchName = `failure/${context.sha.substring(0, 7)}`
+            // Créer la branche failure avec le commit actuel
+            await github.git.createRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: `refs/heads/${branchName}`,
+              sha: context.sha
+            })
+            // Récupérer le commit parent
+            const commit = await github.git.getCommit({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              commit_sha: context.sha
+            })
+            // Revenir d'un commit sur dev
+            await github.git.updateRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: 'heads/dev',
+              sha: commit.data.parents[0].sha,
+              force: true
+            })
+            core.setFailed(`Tests failed. Created branch: ${branchName} and rolled back dev branch`)
