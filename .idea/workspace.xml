@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="9b22af50-1da4-484d-b6cd-ac4639189944" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.github/workflows/ci.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/ci.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/epsi/turnfight/model/Character.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/epsi/turnfight/model/Character.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/epsi/turnfight/service/BattleService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/epsi/turnfight/service/BattleService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/epsi/turnfight/BattleMechanicsTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/epsi/turnfight/BattleMechanicsTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/epsi/turnfight/CharacterBehaviorTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/epsi/turnfight/CharacterBehaviorTest.java" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="MavenImportPreferences">
+    <option name="generalSettings">
+      <MavenGeneralSettings>
+        <option name="mavenHome" value="Use Maven wrapper" />
+        <option name="useMavenConfig" value="true" />
+      </MavenGeneralSettings>
+    </option>
+  </component>
+  <component name="ProjectId" id="2xRRp14SexR2keZGxPanPkmrGGV" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RequestMappingsPanelOrder0": "0",
+    "RequestMappingsPanelOrder1": "1",
+    "RequestMappingsPanelWidth0": "75",
+    "RequestMappingsPanelWidth1": "75",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "spring.configuration.checksum": "3567ae7e83d8116224906ef6069fd9a1",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="RunManager" selected="Spring Boot.TurnFightApplication">
+    <configuration name="BattleMechanicsTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="TurnFight" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.epsi.turnfight.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="com.epsi.turnfight" />
+      <option name="MAIN_CLASS_NAME" value="com.epsi.turnfight.BattleMechanicsTest" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="CharacterBehaviorTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="TurnFight" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.epsi.turnfight.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="com.epsi.turnfight" />
+      <option name="MAIN_CLASS_NAME" value="com.epsi.turnfight.CharacterBehaviorTest" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="CharacterTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="TurnFight" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.epsi.turnfight.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="com.epsi.turnfight" />
+      <option name="MAIN_CLASS_NAME" value="com.epsi.turnfight.CharacterTest" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="TurnFightApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="TurnFight" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.epsi.turnfight.TurnFightApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="JUnit.CharacterBehaviorTest" />
+        <item itemvalue="JUnit.BattleMechanicsTest" />
+        <item itemvalue="JUnit.CharacterTest" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="9b22af50-1da4-484d-b6cd-ac4639189944" name="Changes" comment="" />
+      <created>1747899087642</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1747899087642</updated>
+      <workItem from="1747899094717" duration="8660000" />
+      <workItem from="1750231015383" duration="759000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>
