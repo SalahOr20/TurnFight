@@ -12,6 +12,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # nécessaire pour pouvoir reset et push
 
       - name: Setup Java
         uses: actions/setup-java@v3
@@ -19,44 +21,55 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Build & test with Maven
-        run: ./mvnw clean verify
+      - name: Make mvnw executable
+        run: chmod +x mvnw
 
-      - name: Merge dev to main if tests pass
-        if: success()
+      - name: Build & test with Maven
+        id: maven-test
+        run: ./mvnw clean verify
+        continue-on-error: true  # On continue même si ça plante
+
+      - name: Merge or handle failure
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          set -e
+
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git fetch origin
-          git checkout main
-          git merge origin/dev --no-ff -m "Auto-merge from dev"
-          git push origin main
+          git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}
 
-      - name: Create failure branch if tests fail
-        if: failure()
-        uses: actions/github-script@v6
-        with:
-          script: |
-            const branchName = `failure/${context.sha.substring(0, 7)}`
-            // Créer la branche failure avec le commit actuel
-            await github.git.createRef({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              ref: `refs/heads/${branchName}`,
-              sha: context.sha
-            })
-            // Récupérer le commit parent
-            const commit = await github.git.getCommit({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              commit_sha: context.sha
-            })
-            // Revenir d'un commit sur dev
-            await github.git.updateRef({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              ref: 'heads/dev',
-              sha: commit.data.parents[0].sha,
-              force: true
-            })
-            core.setFailed(`Tests failed. Created branch: ${branchName} and rolled back dev branch`)
+          if [ "${{ steps.maven-test.outcome }}" = "success" ]; then
+            echo "✅ Tests passed, merging dev into main..."
+            git fetch origin
+            git checkout main || git checkout -b main
+            if ! git merge origin/dev --no-ff --allow-unrelated-histories -m "Auto-merge from dev"; then
+              echo "❌ Merge conflict detected. Manual intervention required on branch 'main'."
+              exit 1
+            fi
+            git push origin main
+          else
+            echo "❌ Tests failed, creating failure branch and resetting dev..."
+
+            git fetch origin
+            git checkout dev
+
+            # Vérifier si le dernier commit touche un workflow
+            if git diff --name-only HEAD~1 HEAD | grep -q "^.github/workflows/"; then
+              echo "🚫 Le dernier commit modifie un fichier workflow (.github/workflows/*). Rollback interdit par GitHub Actions."
+              echo "Aucune action automatique sur dev ni création de branche failure."
+              exit 1
+            fi
+
+            # Création d'une branche failure-<shortsha> pour garder une trace
+            FAILURE_BRANCH="failure-$(git rev-parse --short HEAD)"
+            git branch -f "$FAILURE_BRANCH"
+            git push origin "$FAILURE_BRANCH" --force
+
+            # Reculer dev d'un commit
+            git reset --hard HEAD~1
+            git push origin dev --force
+
+            echo "Failure branch '$FAILURE_BRANCH' created and dev branch reset."
+            exit 1  # marque le job comme failed
+          fi
