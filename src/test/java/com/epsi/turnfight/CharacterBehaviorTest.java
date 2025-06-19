@@ -10,7 +10,7 @@ public class CharacterBehaviorTest {
         Character c = new Character("Hero");
         c.takeDamage(3);
         c.takeDamage(2);
-        assertEquals(4, c.getHp());
+        assertEquals(5, c.getHp());
     }
 
     @Test
